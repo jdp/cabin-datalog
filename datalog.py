@@ -53,7 +53,7 @@ class Database:
         return sum(len(v) for v in self.tables.values())
 
 
-class Clause:
+class Rule:
     def __init__(self, head, body=None):
         self.head = head
         self.body = [] if body is None else body
@@ -112,14 +112,14 @@ class Engine:
         self.facts = []
         self.rules = []
 
-    def assert_clause(self, clause):
-        if clause.is_fact:
-            self.facts.append(clause)
+    def assert_rule(self, rule):
+        if rule.is_fact:
+            self.facts.append(rule)
         else:
-            self.rules.append(clause)
+            self.rules.append(rule)
 
     def assert_simple(self, head, *body):
-        self.assert_clause(Clause(head, body))
+        self.assert_rule(Rule(head, body))
 
     def ask(self, query):
         db = evaluate_naive(self.facts, self.rules)
@@ -132,18 +132,18 @@ if __name__ == '__main__':
     # species(nidoking).
     # learns(nidoking, icebeam).
     # learns(Species, icebeam)?
-    db.assert_clause(Clause(App('species', (Const('nidoking'),))))
-    db.assert_clause(Clause(App('learns', (Const('nidoking'), Const('icebeam')))))
+    db.assert_rule(Rule(App('species', (Const('nidoking'),))))
+    db.assert_rule(Rule(App('learns', (Const('nidoking'), Const('icebeam')))))
     for answer in db.ask(App('learns', (Var('Species'), Const('icebeam')))):
         print(f"{answer}.")
 
     # ancestor(A, B) :- parent(A, B)
     # ancestor(A, B) :- parent(A, C), ancestor(C, B).
-    db.assert_clause(Clause(
+    db.assert_rule(Rule(
         App('ancestor', (Var('A'), Var('B'))),
         (App('parent', (Var('A'), Var('B'))),)
     ))
-    db.assert_clause(Clause(
+    db.assert_rule(Rule(
         App('ancestor', (Var('A'), Var('B'))),
         (
             App('parent', (Var('A'), Var('C'))),
