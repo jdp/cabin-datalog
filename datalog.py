@@ -5,13 +5,9 @@ from unify import App, Var, Const, unify
 
 
 class Database:
-    def __init__(self, items=None):
+    def __init__(self):
         self.tables = defaultdict(set)
         self.constants = set()
-        if items is not None:
-            for k, vs in items:
-                for v in vs:
-                    self.tables[k].add(v)
 
     def add(self, atom):
         assert atom.is_ground
@@ -19,6 +15,13 @@ class Database:
         for term in atom.args:
             if isinstance(term, Const):
                 self.constants.add(term)
+
+    def copy(self):
+        new = type(self)()
+        for k, vs in self.tables.items():
+            for v in vs:
+                new.tables[k].add(v)
+        return new
 
     def __contains__(self, atom):
         if isinstance(atom, App):
@@ -72,7 +75,7 @@ def substitute(atom, bindings):
 
 
 def immediate_consequence(program, db):
-    db2 = Database(items=db.tables.items())
+    db2 = db.copy()
     for rule in program:
         if rule.is_fact:
             continue
