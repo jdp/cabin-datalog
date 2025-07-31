@@ -66,7 +66,7 @@ class Rule:
 
     @property
     def is_fact(self):
-        return len(self.body) == 0
+        return self.head.is_ground and len(self.body) == 0
 
     @property
     def variables(self):
