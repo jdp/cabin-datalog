@@ -71,7 +71,8 @@ class Clause:
 
 
 def substitute(atom, bindings):
-    return App(atom.fname, tuple(bindings[a.name] if isinstance(a, Var) else a for a in atom.args))
+    args = tuple(bindings[a.name] if isinstance(a, Var) else a for a in atom.args)
+    return App(atom.fname, args)
 
 
 def immediate_consequence(program, db):
