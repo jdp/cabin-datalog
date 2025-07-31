@@ -26,6 +26,14 @@ class Database:
             db.tables[k] = self.tables[k] - other.tables[k]
         return db
 
+    def __eq__(self, other):
+        if self.tables.keys() != other.tables.keys():
+            return False
+        for k in self.tables.keys():
+            if self.tables[k] != other.tables[k]:
+                return False
+        return True
+
     def __len__(self):
         return sum(len(v) for v in self.tables.values())
 
@@ -100,8 +108,7 @@ class Engine:
             db.extend(fact.head)
         while True:
             db2 = immediate_consequence(self.facts + self.rules, db)
-            delta = db2 - db
-            if len(delta) == 0:
+            if db == db2:
                 break
             else:
                 db = db2
