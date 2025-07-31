@@ -13,7 +13,7 @@ class Database:
                 for v in vs:
                     self.tables[k].add(v)
 
-    def extend(self, atom):
+    def add(self, atom):
         assert atom.is_ground
         self.tables[atom.fname].add(atom)
         for term in atom.args:
@@ -81,7 +81,7 @@ def immediate_consequence(program, db):
             bound = [substitute(atom, binding) for atom in rule.body]
             if all(atom.is_ground and atom in db for atom in bound):
                 derived = substitute(rule.head, binding)
-                db2.extend(derived)
+                db2.add(derived)
     return db2
 
 
@@ -103,7 +103,7 @@ class Engine:
     def ask(self, literal, subst=None):
         db = Database()
         for fact in self.facts:
-            db.extend(fact.head)
+            db.add(fact.head)
         while True:
             db2 = immediate_consequence(self.rules, db)
             if db == db2:
