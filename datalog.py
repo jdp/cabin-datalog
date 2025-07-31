@@ -59,14 +59,10 @@ class Clause:
         self.body = [] if body is None else body
 
     def __str__(self):
-        if self.is_rule:
-            return f'{self.head} :- {", ".join(str(b) for b in self.body)}'
-        else:
+        if self.is_fact:
             return str(self.head)
-
-    @property
-    def is_rule(self):
-        return not self.is_fact
+        else:
+            return f'{self.head} :- {", ".join(str(b) for b in self.body)}'
 
     @property
     def is_fact(self):
