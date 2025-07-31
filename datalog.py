@@ -89,6 +89,20 @@ def immediate_consequence(program, db):
     return db2
 
 
+def evaluate_naive(facts, rules):
+    "Evaluate the program using the naïve algorithm."
+    db = Database()
+    for fact in facts:
+        db.add(fact.head)
+    while True:
+        db2 = immediate_consequence(rules, db)
+        if db == db2:
+            break
+        else:
+            db = db2
+    return db
+
+
 class Engine:
     def __init__(self):
         self.facts = []
@@ -104,21 +118,13 @@ class Engine:
         self.assert_clause(Clause(head, body))
 
     def ask(self, literal, subst=None):
-        db = Database()
-        for fact in self.facts:
-            db.add(fact.head)
-        while True:
-            db2 = immediate_consequence(self.rules, db)
-            if db == db2:
-                break
-            else:
-                db = db2
+        db = evaluate_naive(self.facts, self.rules)
         if subst is None:
             subst = {}
         if literal.is_ground:
             yield literal
         elif isinstance(literal, App):
-            for atom in db2.tables[literal.fname]:
+            for atom in db.tables[literal.fname]:
                 if bindings := unify(literal, atom, subst):
                     yield substitute(literal, bindings)
 
