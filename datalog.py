@@ -18,7 +18,8 @@ class Database:
 
     def search(self, query):
         if query.is_ground:
-            yield query
+            if query in self.tables[query.fname]:
+                yield query
         elif isinstance(query, App):
             for atom in self.tables[query.fname]:
                 if bindings := unify(query, atom, {}):
@@ -135,6 +136,10 @@ if __name__ == '__main__':
     db.assert_rule(Rule(App('species', (Const('nidoking'),))))
     db.assert_rule(Rule(App('learns', (Const('nidoking'), Const('icebeam')))))
     for answer in db.ask(App('learns', (Var('Species'), Const('icebeam')))):
+        print(f"{answer}.")
+
+    db.assert_simple(App('parent', (Const('john'), Const('douglas'))))
+    for answer in db.ask(App('parent', (Const('john'), Const('ebbon')))):
         print(f"{answer}.")
 
     # ancestor(A, B) :- parent(A, B)
