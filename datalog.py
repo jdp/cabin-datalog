@@ -14,11 +14,11 @@ class Database:
 
     def extend(self, atom):
         assert atom.is_ground
-        self.tables[atom.fname].add(atom.args)
+        self.tables[atom.fname].add(atom)
 
-    def __contains__(self, value):
-        if isinstance(value, App):
-            return value.args in self.tables[value.fname]
+    def __contains__(self, atom):
+        if isinstance(atom, App):
+            return atom in self.tables[atom.fname]
 
     def __sub__(self, other):
         db = Database()
@@ -111,8 +111,8 @@ class Engine:
         if literal.is_ground:
             print(literal)
         elif isinstance(literal, App):
-            for args in db2.tables[literal.fname]:
-                if bindings := unify(literal, App(literal.fname, args), subst):
+            for atom in db2.tables[literal.fname]:
+                if bindings := unify(literal, atom, subst):
                     print(f"{substitute(literal, bindings)}.")
 
 

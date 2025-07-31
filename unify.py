@@ -18,12 +18,16 @@ class App(Term):
     def __eq__(self, other):
         return (
             type(self) is type(other)
+            and self.fname == other.fname
             and len(self.args) == len(other.args)
             and all(a == b for a, b in zip(self.args, other.args))
         )
 
     def __str__(self):
         return f"{self.fname}({', '.join(str(arg) for arg in self.args)})"
+
+    def __hash__(self):
+        return hash(self.args)
 
     __repr__ = __str__
 
