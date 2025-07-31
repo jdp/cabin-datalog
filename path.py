@@ -28,4 +28,5 @@ db.assert_simple(
 )
 
 # path(X, Y)?
-db.ask(App('path', (Var('X'), Var('Y'))))
+for answer in db.ask(App('path', (Var('X'), Var('Y')))):
+    print(f"{answer}.")

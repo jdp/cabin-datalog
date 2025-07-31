@@ -95,7 +95,6 @@ class Engine:
         self.rules = []
 
     def assert_clause(self, clause):
-        # print(f"{clause}.")
         if clause.is_fact:
             self.facts.append(clause)
         else:
@@ -116,13 +115,12 @@ class Engine:
                 db = db2
         if subst is None:
             subst = {}
-        # print(f"{literal}?")
         if literal.is_ground:
-            print(literal)
+            yield literal
         elif isinstance(literal, App):
             for atom in db2.tables[literal.fname]:
                 if bindings := unify(literal, atom, subst):
-                    print(f"{substitute(literal, bindings)}.")
+                    yield substitute(literal, bindings)
 
 
 if __name__ == '__main__':
@@ -131,20 +129,21 @@ if __name__ == '__main__':
     # species(nidoking).
     # learns(nidoking, icebeam).
     # learns(Species, icebeam)?
-    db.assert_clause(Clause(App('species', [Const('nidoking')])))
-    db.assert_clause(Clause(App('learns', [Const('nidoking'), Const('icebeam')])))
-    db.ask(App('learns', [Var('Species'), Const('icebeam')]))
+    db.assert_clause(Clause(App('species', (Const('nidoking'),))))
+    db.assert_clause(Clause(App('learns', (Const('nidoking'), Const('icebeam')))))
+    for answer in db.ask(App('learns', (Var('Species'), Const('icebeam')))):
+        print(f"{answer}.")
 
     # ancestor(A, B) :- parent(A, B)
     # ancestor(A, B) :- parent(A, C), ancestor(C, B).
     db.assert_clause(Clause(
-        App('ancestor', [Var('A'), Var('B')]),
-        [App('parent', [Var('A'), Var('B')])]
+        App('ancestor', (Var('A'), Var('B'))),
+        (App('parent', (Var('A'), Var('B'))),)
     ))
     db.assert_clause(Clause(
-        App('ancestor', [Var('A'), Var('B')]),
-        [
-            App('parent', [Var('A'), Var('C')]),
-            App('ancestor', [Var('C'), Var('B')])
-        ]
+        App('ancestor', (Var('A'), Var('B'))),
+        (
+            App('parent', (Var('A'), Var('C'))),
+            App('ancestor', (Var('C'), Var('B')))
+        )
     ))
