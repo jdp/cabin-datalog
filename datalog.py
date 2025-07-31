@@ -7,6 +7,7 @@ from unify import App, Var, Const, unify
 class Database:
     def __init__(self, items=None):
         self.tables = defaultdict(set)
+        self.constants = set()
         if items is not None:
             for k, vs in items:
                 for v in vs:
@@ -15,6 +16,9 @@ class Database:
     def extend(self, atom):
         assert atom.is_ground
         self.tables[atom.fname].add(atom)
+        for term in atom.args:
+            if isinstance(term, Const):
+                self.constants.add(term)
 
     def __contains__(self, atom):
         if isinstance(atom, App):
@@ -69,16 +73,9 @@ def substitute(atom, bindings):
 
 def immediate_consequence(program, db):
     db2 = Database(items=db.tables.items())
-    constants = set()
-    for rule in program:
-        if rule.is_fact:
-            for term in rule.head.args:
-                if isinstance(term, Const):
-                    constants.add(term)
-            db2.extend(rule.head)
     for rule in program:
         if not rule.is_fact:
-            for values in product(constants, repeat=len(rule.variables)):
+            for values in product(db.constants, repeat=len(rule.variables)):
                 binding = dict(zip([v.name for v in rule.variables], values))
                 bound = [substitute(atom, binding) for atom in rule.body]
                 if all(atom.is_ground and atom in db for atom in bound):
