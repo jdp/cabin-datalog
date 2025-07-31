@@ -70,6 +70,19 @@ class Rule:
         return self.head.is_ground and len(self.body) == 0
 
     @property
+    def is_safe(self):
+        return self.head_variables & self.body_variables == self.head_variables
+
+    @property
+    def head_variables(self):
+        return set(v for v in self.head.args if isinstance(v, Var))
+
+    @property
+    def body_variables(self):
+        body_args = chain.from_iterable(b.args for b in self.body)
+        return set(v for v in body_args if isinstance(v, Var))
+
+    @property
     def variables(self):
         terms = chain(self.head.args, chain.from_iterable(b.args for b in self.body))
         return set(v for v in terms if isinstance(v, Var))
@@ -114,6 +127,7 @@ class Engine:
         self.rules = []
 
     def assert_rule(self, rule):
+        assert rule.is_safe
         if rule.is_fact:
             self.facts.append(rule)
         else:
