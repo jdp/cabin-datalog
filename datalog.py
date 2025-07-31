@@ -16,6 +16,14 @@ class Database:
             if isinstance(term, Const):
                 self.constants.add(term)
 
+    def search(self, query):
+        if query.is_ground:
+            yield query
+        elif isinstance(query, App):
+            for atom in self.tables[query.fname]:
+                if bindings := unify(query, atom, {}):
+                    yield substitute(query, bindings)
+
     def copy(self):
         new = type(self)()
         for k, vs in self.tables.items():
@@ -117,16 +125,9 @@ class Engine:
     def assert_simple(self, head, *body):
         self.assert_clause(Clause(head, body))
 
-    def ask(self, literal, subst=None):
+    def ask(self, query):
         db = evaluate_naive(self.facts, self.rules)
-        if subst is None:
-            subst = {}
-        if literal.is_ground:
-            yield literal
-        elif isinstance(literal, App):
-            for atom in db.tables[literal.fname]:
-                if bindings := unify(literal, atom, subst):
-                    yield substitute(literal, bindings)
+        yield from db.search(query)
 
 
 if __name__ == '__main__':
