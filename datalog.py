@@ -74,13 +74,14 @@ def substitute(atom, bindings):
 def immediate_consequence(program, db):
     db2 = Database(items=db.tables.items())
     for rule in program:
-        if not rule.is_fact:
-            for values in product(db.constants, repeat=len(rule.variables)):
-                binding = dict(zip([v.name for v in rule.variables], values))
-                bound = [substitute(atom, binding) for atom in rule.body]
-                if all(atom.is_ground and atom in db for atom in bound):
-                    derived = substitute(rule.head, binding)
-                    db2.extend(derived)
+        if rule.is_fact:
+            continue
+        for values in product(db.constants, repeat=len(rule.variables)):
+            binding = dict(zip([v.name for v in rule.variables], values))
+            bound = [substitute(atom, binding) for atom in rule.body]
+            if all(atom.is_ground and atom in db for atom in bound):
+                derived = substitute(rule.head, binding)
+                db2.extend(derived)
     return db2
 
 
@@ -104,7 +105,7 @@ class Engine:
         for fact in self.facts:
             db.extend(fact.head)
         while True:
-            db2 = immediate_consequence(self.facts + self.rules, db)
+            db2 = immediate_consequence(self.rules, db)
             if db == db2:
                 break
             else:
