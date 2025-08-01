@@ -57,7 +57,7 @@ class Database:
 class Rule:
     def __init__(self, head, body=None):
         self.head = head
-        self.body = [] if body is None else body
+        self.body = () if body is None else tuple(body)
 
     def __str__(self):
         if self.is_fact:

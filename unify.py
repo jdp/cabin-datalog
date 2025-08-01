@@ -7,9 +7,9 @@ class Term:
 
 
 class App(Term):
-    def __init__(self, fname, args=()):
+    def __init__(self, fname, args=None):
         self.fname = fname
-        self.args = args
+        self.args = () if args is None else tuple(args)
 
     @property
     def is_ground(self):
