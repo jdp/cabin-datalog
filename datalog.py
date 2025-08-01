@@ -97,23 +97,22 @@ def immediate_consequence(program, db):
     db2 = db.copy()
     for rule in program:
         if rule.is_fact:
-            continue
-        for values in product(db.constants, repeat=len(rule.variables)):
-            binding = dict(zip([v.name for v in rule.variables], values))
-            bound = [substitute(atom, binding) for atom in rule.body]
-            if all(atom.is_ground and atom in db for atom in bound):
-                derived = substitute(rule.head, binding)
-                db2.add(derived)
+            db2.add(rule.head)
+        else:
+            for values in product(db.constants, repeat=len(rule.variables)):
+                binding = dict(zip([v.name for v in rule.variables], values))
+                bound = [substitute(atom, binding) for atom in rule.body]
+                if all(atom.is_ground and atom in db for atom in bound):
+                    derived = substitute(rule.head, binding)
+                    db2.add(derived)
     return db2
 
 
-def evaluate_naive(facts, rules):
+def evaluate_naive(program):
     "Evaluate the program using the naïve algorithm."
     db = Database()
-    for fact in facts:
-        db.add(fact.head)
     while True:
-        db2 = immediate_consequence(rules, db)
+        db2 = immediate_consequence(program, db)
         if db == db2:
             break
         else:
@@ -123,21 +122,17 @@ def evaluate_naive(facts, rules):
 
 class Engine:
     def __init__(self):
-        self.facts = []
         self.rules = []
 
     def assert_rule(self, rule):
         assert rule.is_safe
-        if rule.is_fact:
-            self.facts.append(rule)
-        else:
-            self.rules.append(rule)
+        self.rules.append(rule)
 
     def assert_simple(self, head, *body):
         self.assert_rule(Rule(head, body))
 
     def ask(self, query):
-        db = evaluate_naive(self.facts, self.rules)
+        db = evaluate_naive(self.rules)
         yield from db.search(query)
 
 
