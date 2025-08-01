@@ -136,33 +136,3 @@ class Engine:
     def ask(self, query):
         db = evaluate_naive(self.rules)
         yield from db.search(query)
-
-
-if __name__ == '__main__':
-    db = Engine()
-
-    # species(nidoking).
-    # learns(nidoking, icebeam).
-    # learns(Species, icebeam)?
-    db.assert_rule(Rule(App('species', (Const('nidoking'),))))
-    db.assert_rule(Rule(App('learns', (Const('nidoking'), Const('icebeam')))))
-    for answer in db.ask(App('learns', (Var('Species'), Const('icebeam')))):
-        print(f"{answer}.")
-
-    db.assert_simple(App('parent', (Const('john'), Const('douglas'))))
-    for answer in db.ask(App('parent', (Const('john'), Const('ebbon')))):
-        print(f"{answer}.")
-
-    # ancestor(A, B) :- parent(A, B)
-    # ancestor(A, B) :- parent(A, C), ancestor(C, B).
-    db.assert_rule(Rule(
-        App('ancestor', (Var('A'), Var('B'))),
-        (App('parent', (Var('A'), Var('B'))),)
-    ))
-    db.assert_rule(Rule(
-        App('ancestor', (Var('A'), Var('B'))),
-        (
-            App('parent', (Var('A'), Var('C'))),
-            App('ancestor', (Var('C'), Var('B')))
-        )
-    ))

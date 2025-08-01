@@ -68,7 +68,6 @@ class Const(Term):
 
 
 def unify(x, y, subst):
-    # print("UNIFY", x, y, subst)
     if subst is None:
         return None
     elif x == y:
@@ -89,7 +88,6 @@ def unify(x, y, subst):
 
 
 def unify_variable(v, x, subst):
-    # print("UNIFY-VARIABLE", v, x, subst)
     assert isinstance(v, Var)
     if v.name in subst:
         return unify(subst[v.name], x, subst)
@@ -111,42 +109,3 @@ def occurs_check(v, term, subs):
         return any(occurs_check(v, arg, subs) for arg in term.args)
     else:
         return False
-
-
-if __name__ == '__main__':
-    # learns(nidoking, icebeam).
-    # learns(Species, icebeam)?
-    print(unify(
-        App('learns', (Const('nidoking'), Const('icebeam'))),
-        App('learns', (Var('Species'), Const('icebeam'))),
-        {}
-    ))
-
-    # f(a) ? f(a)
-    print(unify(
-        App('f', [Const('a')]),
-        App('f', [Const('a')]),
-        {}
-    ))
-
-    # f(A) ? f(g())
-    print(unify(
-        App('f', [Var('A')]),
-        App('f', [App('g')]),
-        {}
-    ))
-
-    # f(a, b, bar(c)) ? f(a, V, X)
-    print(unify(
-        App('f', [Const('a'), Const('b'), App('bar', [Const('c')])]),
-        App('f', [Const('a'), Var('V'), Var('X')]),
-        {}
-    ))
-
-    # ancestor(A, B) :- parent(A, B).
-    # ancestor(A, B) :- parent(A, C), ancestor(C, B).
-    print(unify(
-        App('ancestor', [Var('A'), Var('B')]),
-        App('parent', [Var('A'), Var('B')]),
-        {}
-    ))
