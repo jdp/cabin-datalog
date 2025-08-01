@@ -97,20 +97,22 @@ def immediate_consequence(program, db):
     db2 = db.copy()
     for rule in program:
         if rule.is_fact:
-            db2.add(rule.head)
-        else:
-            for values in product(db.constants, repeat=len(rule.variables)):
-                binding = dict(zip([v.name for v in rule.variables], values))
-                bound = [substitute(atom, binding) for atom in rule.body]
-                if all(atom.is_ground and atom in db for atom in bound):
-                    derived = substitute(rule.head, binding)
-                    db2.add(derived)
+            continue
+        for values in product(db.constants, repeat=len(rule.variables)):
+            binding = dict(zip([v.name for v in rule.variables], values))
+            bound = [substitute(atom, binding) for atom in rule.body]
+            if all(atom.is_ground and atom in db for atom in bound):
+                derived = substitute(rule.head, binding)
+                db2.add(derived)
     return db2
 
 
 def evaluate_naive(program):
     "Evaluate the program using the naïve algorithm."
     db = Database()
+    for rule in program:
+        if rule.is_fact:
+            db.add(rule.head)
     while True:
         db2 = immediate_consequence(program, db)
         if db == db2:
