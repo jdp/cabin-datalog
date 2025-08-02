@@ -65,6 +65,8 @@ class Rule:
         else:
             return f'{self.head} :- {", ".join(str(b) for b in self.body)}'
 
+    __repr__ = __str__
+
     @property
     def is_fact(self):
         return self.head.is_ground and len(self.body) == 0
@@ -120,6 +122,26 @@ def evaluate_naive(program):
         else:
             db = db2
     return db
+
+
+class Assertion:
+    def __init__(self, rule):
+        self.rule = rule
+
+    def __str__(self):
+        return f"{self.rule}."
+
+    __repr__ = __str__
+
+
+class Query:
+    def __init__(self, atom):
+        self.atom = atom
+
+    def __str__(self):
+        return f"{self.atom}?"
+
+    __repr__ = __str__
 
 
 class Engine:
