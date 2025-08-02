@@ -146,12 +146,10 @@ terms = cons([term, rep0(seq([comma, term]))])
 args = apply(lambda *rs: rs[1], [lparen, maybe([], terms), rparen])
 atom = apply(App, [identifier, maybe([], args)])
 atoms = cons([atom, rep0(seq([comma, atom]))])
+fact = coerce(lambda head: Rule(head, []), atom)
 body = seq([implies, atoms])
-rule = one([
-    apply(Rule, [atom, body]),
-    coerce(lambda head: Rule(head, []), atom)
-])
-assertion = coerce(Assertion, keep([rule, period]))
+rule = apply(Rule, [atom, body])
+assertion = coerce(Assertion, keep([one([rule, fact]), period]))
 query = coerce(Query, keep([atom, question]))
 
 
