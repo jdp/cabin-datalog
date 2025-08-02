@@ -162,6 +162,11 @@ def eof(source):
 
 program = skip(eof)(seq([spaces, rep1(one([assertion, query]))]))
 
+
+def parse_program(source):
+    return parse(program, source)['data']
+
+
 if __name__ == '__main__':
     source = """
     p. p().

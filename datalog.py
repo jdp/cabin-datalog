@@ -95,9 +95,9 @@ def substitute(atom, bindings):
     return App(atom.fname, args)
 
 
-def immediate_consequence(program, db):
+def immediate_consequence(rules, db):
     db2 = db.copy()
-    for rule in program:
+    for rule in rules:
         if rule.is_fact:
             continue
         for values in product(db.constants, repeat=len(rule.variables)):
@@ -109,14 +109,14 @@ def immediate_consequence(program, db):
     return db2
 
 
-def evaluate_naive(program):
-    "Evaluate the program using the naïve algorithm."
+def evaluate_naive(rules):
+    "Evaluate the rules using the naïve algorithm."
     db = Database()
-    for rule in program:
+    for rule in rules:
         if rule.is_fact:
             db.add(rule.head)
     while True:
-        db2 = immediate_consequence(program, db)
+        db2 = immediate_consequence(rules, db)
         if db == db2:
             break
         else:
@@ -158,3 +158,13 @@ class Engine:
     def ask(self, query):
         db = evaluate_naive(self.rules)
         yield from db.search(query)
+
+
+def eval_program(program):
+    dl = Engine()
+    for node in program:
+        match node:
+            case Assertion():
+                dl.assert_rule(node.rule)
+            case Query():
+                yield from dl.ask(node.atom)
