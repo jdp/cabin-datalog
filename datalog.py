@@ -168,3 +168,22 @@ def eval_program(program):
                 dl.assert_rule(node.rule)
             case Query():
                 yield from dl.ask(node.atom)
+
+
+if __name__ == '__main__':
+    answers = eval_program([
+        Assertion(Rule(App('edge', [Const('a'), Const('b')]))),
+        Assertion(Rule(App('edge', [Const('b'), Const('c')]))),
+        Assertion(Rule(App('edge', [Const('c'), Const('d')]))),
+        Assertion(Rule(App('edge', [Const('d'), Const('a')]))),
+        Assertion(Rule(App('path', [Var('X'), Var('Y')]), [
+            App('edge', [Var('X'), Var('Y')])
+        ])),
+        Assertion(Rule(App('path', [Var('X'), Var('Y')]), [
+            App('path', [Var('X'), Var('Z')]),
+            App('path', [Var('Z'), Var('Y')])
+        ])),
+        Query(App('path', [Var('X'), Var('Y')]))
+    ])
+    for answer in answers:
+        print(f"{answer}.")
