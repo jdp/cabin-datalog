@@ -136,7 +136,6 @@ comma = lexeme(text(','))
 implies = lexeme(text(':-'))
 period = lexeme(text('.'))
 question = lexeme(text('?'))
-punctuation = lexeme(regex(r'[.?]'))
 
 const = coerce(Const, identifier)
 var = coerce(Var, lexeme(regex('[A-Z]+')))
