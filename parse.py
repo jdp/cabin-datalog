@@ -141,6 +141,13 @@ def skip(junk):
     return skipper
 
 
+def eof(source):
+    if not source:
+        return succeed(None, source)
+    else:
+        return fail("end of input", source)
+
+
 spaces = regex(r'\s*')
 lexeme = skip(spaces)
 
@@ -164,15 +171,6 @@ body = seq([implies, atoms])
 rule = apply(Rule, [atom, body])
 assertion = map(Assertion, keep([one([rule, fact]), period]))
 query = map(Query, keep([atom, question]))
-
-
-def eof(source):
-    if not source:
-        return succeed(None, source)
-    else:
-        return fail("end of input", source)
-
-
 program = seq([spaces, until(one([assertion, query]), eof)])
 
 
