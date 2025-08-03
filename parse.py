@@ -78,23 +78,24 @@ def one(parsers):
     return one_parser
 
 
-def rep1(parser):
-    def rep1_parser(source):
+def many(parser, n=0):
+    def many_parser(source):
         acc_data = []
         src = source
-        result = parser(src)
-        if result['failed']:
-            return result
-        acc_data.append(result['data'])
-        src = result['rest']
         while True:
             result = parser(src)
             src = result['rest']
             if result['failed']:
                 break
             acc_data.append(result['data'])
-        return succeed(acc_data, src)
-    return rep1_parser
+        if len(acc_data) < n:
+            return fail(f'at least {n} repetitions', result['rest'])
+        else:
+            return succeed(acc_data, src)
+    return many_parser
+
+
+many1 = partial(many, n=1)
 
 
 def maybe(value, parser):
@@ -105,10 +106,6 @@ def maybe(value, parser):
         else:
             return result
     return maybe_parser
-
-
-def rep0(parser):
-    return maybe([], rep1(parser))
 
 
 keep = partial(apply, lambda *data: data[0])
@@ -140,11 +137,11 @@ question = lexeme(text('?'))
 const = coerce(Const, identifier)
 var = coerce(Var, lexeme(regex('[A-Z]+')))
 term = one([const, var])
-terms = cons([term, rep0(seq([comma, term]))])
+terms = cons([term, many(seq([comma, term]))])
 
 args = apply(lambda *rs: rs[1], [lparen, maybe([], terms), rparen])
 atom = apply(Atom, [identifier, maybe([], args)])
-atoms = cons([atom, rep0(seq([comma, atom]))])
+atoms = cons([atom, many(seq([comma, atom]))])
 fact = coerce(lambda head: Rule(head, []), atom)
 body = seq([implies, atoms])
 rule = apply(Rule, [atom, body])
@@ -159,7 +156,7 @@ def eof(source):
         return fail("end of input", source)
 
 
-program = skip(eof)(seq([spaces, rep1(one([assertion, query]))]))
+program = skip(eof)(seq([spaces, many1(one([assertion, query]))]))
 
 
 def parse_program(source):
