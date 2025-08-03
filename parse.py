@@ -108,6 +108,24 @@ def maybe(value, parser):
     return maybe_parser
 
 
+def until(parser, end):
+    def until_parser(source):
+        acc_data = []
+        src = source
+        while True:
+            result1 = parser(src)
+            if result1['failed']:
+                result2 = end(result1['rest'])
+                if result2['failed']:
+                    return fail('until', result2['rest'])
+                else:
+                    return succeed(acc_data, result2['rest'])
+            else:
+                src = result1['rest']
+                acc_data.append(result1['data'])
+    return until_parser
+
+
 keep = partial(apply, lambda *data: data[0])
 
 seq = partial(apply, lambda *data: data[-1])
@@ -138,7 +156,6 @@ const = map(Const, identifier)
 var = map(Var, lexeme(regex('[A-Z]+')))
 term = one([const, var])
 terms = cons([term, many(seq([comma, term]))])
-
 args = apply(lambda *rs: rs[1], [lparen, maybe([], terms), rparen])
 atom = apply(Atom, [identifier, maybe([], args)])
 atoms = cons([atom, many(seq([comma, atom]))])
@@ -156,7 +173,7 @@ def eof(source):
         return fail("end of input", source)
 
 
-program = skip(eof)(seq([spaces, many1(one([assertion, query]))]))
+program = seq([spaces, until(one([assertion, query]), eof)])
 
 
 def parse_program(source):
