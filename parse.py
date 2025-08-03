@@ -108,7 +108,7 @@ def maybe(value, parser):
     return maybe_parser
 
 
-def until(parser, end):
+def until(end, parser):
     def until_parser(source):
         acc_data = []
         src = source
@@ -171,7 +171,7 @@ body = seq([implies, atoms])
 rule = apply(Rule, [atom, body])
 assertion = map(Assertion, keep([one([rule, fact]), period]))
 query = map(Query, keep([atom, question]))
-program = seq([spaces, until(one([assertion, query]), eof)])
+program = seq([spaces, until(eof, one([assertion, query]))])
 
 
 def parse_program(source):
