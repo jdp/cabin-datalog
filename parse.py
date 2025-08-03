@@ -43,14 +43,14 @@ def regex(pattern):
     return parser
 
 
-def coerce(func, parser):
-    def coerce_parser(source):
+def map(func, parser):
+    def map_parser(source):
         result = parser(source)
         if result['failed']:
             return result
         else:
             return succeed(func(result['data']), result['rest'])
-    return coerce_parser
+    return map_parser
 
 
 def apply(func, parsers):
@@ -134,19 +134,19 @@ implies = lexeme(text(':-'))
 period = lexeme(text('.'))
 question = lexeme(text('?'))
 
-const = coerce(Const, identifier)
-var = coerce(Var, lexeme(regex('[A-Z]+')))
+const = map(Const, identifier)
+var = map(Var, lexeme(regex('[A-Z]+')))
 term = one([const, var])
 terms = cons([term, many(seq([comma, term]))])
 
 args = apply(lambda *rs: rs[1], [lparen, maybe([], terms), rparen])
 atom = apply(Atom, [identifier, maybe([], args)])
 atoms = cons([atom, many(seq([comma, atom]))])
-fact = coerce(lambda head: Rule(head, []), atom)
+fact = map(lambda head: Rule(head, []), atom)
 body = seq([implies, atoms])
 rule = apply(Rule, [atom, body])
-assertion = coerce(Assertion, keep([one([rule, fact]), period]))
-query = coerce(Query, keep([atom, question]))
+assertion = map(Assertion, keep([one([rule, fact]), period]))
+query = map(Query, keep([atom, question]))
 
 
 def eof(source):
