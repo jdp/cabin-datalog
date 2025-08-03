@@ -6,7 +6,7 @@ class Term:
         return False
 
 
-class App(Term):
+class Atom(Term):
     def __init__(self, fname, args=None):
         self.fname = fname
         self.args = () if args is None else tuple(args)
@@ -76,7 +76,7 @@ def unify(x, y, subst):
         return unify_variable(x, y, subst)
     elif isinstance(y, Var):
         return unify_variable(y, x, subst)
-    elif isinstance(x, App) and isinstance(y, App):
+    elif isinstance(x, Atom) and isinstance(y, Atom):
         if x.fname != y.fname or len(x.args) != len(y.args):
             return None
         else:
@@ -105,7 +105,7 @@ def occurs_check(v, term, subs):
         return True
     elif isinstance(term, Var) and term.name in subs:
         return occurs_check(v, subs[term.name], subs)
-    elif isinstance(term, App):
+    elif isinstance(term, Atom):
         return any(occurs_check(v, arg, subs) for arg in term.args)
     else:
         return False

@@ -1,7 +1,7 @@
 from collections import defaultdict
 from itertools import chain, product
 
-from unify import App, Var, Const, unify
+from unify import Atom, Var, Const, unify
 
 
 class Database:
@@ -20,7 +20,7 @@ class Database:
         if query.is_ground:
             if query in self.tables[query.fname]:
                 yield query
-        elif isinstance(query, App):
+        elif isinstance(query, Atom):
             for atom in self.tables[query.fname]:
                 if bindings := unify(query, atom, {}):
                     yield substitute(query, bindings)
@@ -33,7 +33,7 @@ class Database:
         return new
 
     def __contains__(self, atom):
-        if isinstance(atom, App):
+        if isinstance(atom, Atom):
             return atom in self.tables[atom.fname]
 
     def __sub__(self, other):
@@ -92,7 +92,7 @@ class Rule:
 
 def substitute(atom, bindings):
     args = tuple(bindings[a.name] if isinstance(a, Var) else a for a in atom.args)
-    return App(atom.fname, args)
+    return Atom(atom.fname, args)
 
 
 def immediate_consequence(rules, db):
@@ -172,18 +172,18 @@ def eval_program(program):
 
 if __name__ == '__main__':
     answers = eval_program([
-        Assertion(Rule(App('edge', [Const('a'), Const('b')]))),
-        Assertion(Rule(App('edge', [Const('b'), Const('c')]))),
-        Assertion(Rule(App('edge', [Const('c'), Const('d')]))),
-        Assertion(Rule(App('edge', [Const('d'), Const('a')]))),
-        Assertion(Rule(App('path', [Var('X'), Var('Y')]), [
-            App('edge', [Var('X'), Var('Y')])
+        Assertion(Rule(Atom('edge', [Const('a'), Const('b')]))),
+        Assertion(Rule(Atom('edge', [Const('b'), Const('c')]))),
+        Assertion(Rule(Atom('edge', [Const('c'), Const('d')]))),
+        Assertion(Rule(Atom('edge', [Const('d'), Const('a')]))),
+        Assertion(Rule(Atom('path', [Var('X'), Var('Y')]), [
+            Atom('edge', [Var('X'), Var('Y')])
         ])),
-        Assertion(Rule(App('path', [Var('X'), Var('Y')]), [
-            App('path', [Var('X'), Var('Z')]),
-            App('path', [Var('Z'), Var('Y')])
+        Assertion(Rule(Atom('path', [Var('X'), Var('Y')]), [
+            Atom('path', [Var('X'), Var('Z')]),
+            Atom('path', [Var('Z'), Var('Y')])
         ])),
-        Query(App('path', [Var('X'), Var('Y')]))
+        Query(Atom('path', [Var('X'), Var('Y')]))
     ])
     for answer in answers:
         print(f"{answer}.")

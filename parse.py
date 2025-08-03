@@ -1,7 +1,7 @@
 import re
 from functools import partial
 
-from datalog import Assertion, Query, Rule, App, Const, Var
+from datalog import Assertion, Query, Rule, Atom, Const, Var
 
 
 def succeed(data, rest):
@@ -143,7 +143,7 @@ term = one([const, var])
 terms = cons([term, rep0(seq([comma, term]))])
 
 args = apply(lambda *rs: rs[1], [lparen, maybe([], terms), rparen])
-atom = apply(App, [identifier, maybe([], args)])
+atom = apply(Atom, [identifier, maybe([], args)])
 atoms = cons([atom, rep0(seq([comma, atom]))])
 fact = coerce(lambda head: Rule(head, []), atom)
 body = seq([implies, atoms])
