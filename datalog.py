@@ -84,11 +84,6 @@ class Rule:
         body_args = chain.from_iterable(b.args for b in self.body)
         return set(v for v in body_args if isinstance(v, Var))
 
-    @property
-    def variables(self):
-        terms = chain(self.head.args, chain.from_iterable(b.args for b in self.body))
-        return set(v for v in terms if isinstance(v, Var))
-
 
 def substitute(atom, bindings):
     args = tuple(bindings[a.name] if isinstance(a, Var) else a for a in atom.args)
@@ -100,8 +95,8 @@ def immediate_consequence(rules, db):
     for rule in rules:
         if rule.is_fact:
             continue
-        for values in product(db.constants, repeat=len(rule.variables)):
-            binding = dict(zip([v.name for v in rule.variables], values))
+        for values in product(db.constants, repeat=len(rule.body_variables)):
+            binding = dict(zip([v.name for v in rule.body_variables], values))
             bound = [substitute(atom, binding) for atom in rule.body]
             if all(atom.is_ground and atom in db for atom in bound):
                 derived = substitute(rule.head, binding)
