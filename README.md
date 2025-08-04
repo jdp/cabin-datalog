@@ -40,7 +40,7 @@ d.assert_simple(Atom('edge', [Const('c'), Const('d')]))
 
 # path(X, Y) :- edge(X, Y).
 d.assert_simple(
-    Atom('path', [Var('X'), Var('Y')])
+    Atom('path', [Var('X'), Var('Y')]),
     Atom('edge', [Var('X'), Var('Y')])
 )
 
