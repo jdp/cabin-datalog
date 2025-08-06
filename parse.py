@@ -1,7 +1,7 @@
 import re
 from functools import partial
 
-from datalog import Assertion, Query, Rule, Atom, Const, Var
+from expr import Assertion, Query, Rule, Atom, Const, Var
 
 
 def succeed(data, rest):

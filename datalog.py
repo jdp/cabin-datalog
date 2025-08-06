@@ -1,7 +1,8 @@
 from collections import defaultdict
-from itertools import chain, product
+from itertools import product
 
-from unify import Atom, Var, Const, unify
+from expr import Assertion, Atom, Const, Query, Rule, Var
+from unify import unify
 
 
 class Database:
@@ -54,37 +55,6 @@ class Database:
         return sum(len(v) for v in self.tables.values())
 
 
-class Rule:
-    def __init__(self, head, body=None):
-        self.head = head
-        self.body = () if body is None else tuple(body)
-
-    def __str__(self):
-        if self.is_fact:
-            return str(self.head)
-        else:
-            return f'{self.head} :- {", ".join(str(b) for b in self.body)}'
-
-    __repr__ = __str__
-
-    @property
-    def is_fact(self):
-        return self.head.is_ground and len(self.body) == 0
-
-    @property
-    def is_safe(self):
-        return self.head_variables & self.body_variables == self.head_variables
-
-    @property
-    def head_variables(self):
-        return set(v for v in self.head.args if isinstance(v, Var))
-
-    @property
-    def body_variables(self):
-        body_args = chain.from_iterable(b.args for b in self.body)
-        return set(v for v in body_args if isinstance(v, Var))
-
-
 def substitute(atom, bindings):
     args = tuple(bindings[a.name] if isinstance(a, Var) else a for a in atom.args)
     return Atom(atom.fname, args)
@@ -117,26 +87,6 @@ def evaluate_naive(rules):
         else:
             db = db2
     return db
-
-
-class Assertion:
-    def __init__(self, rule):
-        self.rule = rule
-
-    def __str__(self):
-        return f"{self.rule}."
-
-    __repr__ = __str__
-
-
-class Query:
-    def __init__(self, atom):
-        self.atom = atom
-
-    def __str__(self):
-        return f"{self.atom}?"
-
-    __repr__ = __str__
 
 
 class Engine:
