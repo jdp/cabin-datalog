@@ -3,6 +3,11 @@
 from expr import Atom, Var
 
 
+def substitute(atom, bindings):
+    args = tuple(bindings[a.name] if isinstance(a, Var) else a for a in atom.args)
+    return Atom(atom.fname, args)
+
+
 def unify(x, y, subst):
     if subst is None:
         return None
