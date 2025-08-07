@@ -1,7 +1,7 @@
 import argparse
 import sys
 
-from datalog import eval_program
+from evaluate import eval_program
 from parse import ParseFailure, parse_program
 
 
