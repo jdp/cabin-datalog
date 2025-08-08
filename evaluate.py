@@ -49,16 +49,18 @@ class Engine:
         db = evaluate_naive(self.rules)
         yield from db.search(query)
 
+    def run(self, program):
+        for node in program:
+            match node:
+                case Assertion():
+                    self.assert_rule(node.rule)
+                case Query():
+                    yield from self.ask(node.atom)
 
-def eval_program(program, dl=None):
-    if dl is None:
-        dl = Engine()
-    for node in program:
-        match node:
-            case Assertion():
-                dl.assert_rule(node.rule)
-            case Query():
-                yield from dl.ask(node.atom)
+
+def eval_program(program):
+    dl = Engine()
+    return dl.run(program)
 
 
 if __name__ == '__main__':

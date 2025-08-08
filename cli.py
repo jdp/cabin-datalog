@@ -1,12 +1,12 @@
 import argparse
 import sys
 
-from evaluate import Engine, eval_program
+from evaluate import Engine
 from parse import ParseFailure, parse_program
 
 
 def run(dl, program):
-    for answer in eval_program(program, dl):
+    for answer in dl.run(program):
         print(f"{answer}.")
 
 
