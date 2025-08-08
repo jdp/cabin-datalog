@@ -50,8 +50,9 @@ class Engine:
         yield from db.search(query)
 
 
-def eval_program(program):
-    dl = Engine()
+def eval_program(program, dl=None):
+    if dl is None:
+        dl = Engine()
     for node in program:
         match node:
             case Assertion():
