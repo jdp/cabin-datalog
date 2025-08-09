@@ -3,7 +3,7 @@
 # path(X, Y) :- edge(X, Z), path(Z, Y).
 # path(X, Y)?
 
-from evaluate import Engine, Atom, Const, Var
+from interpret import Engine, Atom, Const, Var
 
 db = Engine()
 

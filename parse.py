@@ -1,7 +1,8 @@
 import re
 from functools import partial
 
-from expr import Assertion, Query, Rule, Atom, Const, Var
+from expr import Rule, Atom, Const, Var
+from commands import Assertion, Query
 
 
 def succeed(data, rest):

@@ -1,7 +1,7 @@
 import argparse
 import sys
 
-from evaluate import Engine
+from interpret import Engine
 from parse import ParseFailure, parse_program
 
 
