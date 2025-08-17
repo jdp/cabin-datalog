@@ -1,7 +1,7 @@
 from itertools import product
 
 from database import Database
-from unify import substitute
+from expr import substitute
 
 
 def immediate_consequence(rules, db):

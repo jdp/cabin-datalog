@@ -1,7 +1,7 @@
 from collections import defaultdict
 
-from expr import Atom, Const
-from unify import substitute, unify
+from expr import Atom, Const, substitute
+from unify import unify
 
 
 class Database:

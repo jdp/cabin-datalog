@@ -97,3 +97,8 @@ class Rule:
     def body_variables(self):
         body_args = chain.from_iterable(b.args for b in self.body)
         return set(v for v in body_args if isinstance(v, Var))
+
+
+def substitute(atom, bindings):
+    args = tuple(bindings[a.name] if isinstance(a, Var) else a for a in atom.args)
+    return Atom(atom.fname, args)
